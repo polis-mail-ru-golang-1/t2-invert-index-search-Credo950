@@ -4,9 +4,9 @@ import funct "./functional"
 import "log"
 
 func main() {
-	dict := make(map[string][]string)
+	dict := make(map[string]map[string]int)
 
-	args, err := funct.FillDict(dict)
+	_, err := funct.FillDict(dict)
 	if err != nil {
 		log.Fatalf("ReadLines: %s", err)
 	}
@@ -16,15 +16,12 @@ func main() {
 	phrase := funct.ReadPhrase()
 
 	counter := make(map[string]int)
-	for _, fileName := range args {
-		counter[fileName] = 0
-	}
 
-	for i, fileSlice := range dict {
-		for _, word := range phrase {
-			if i == word {
-				for _, fileName := range fileSlice {
-					counter[fileName]++
+	for i, item := range dict {
+		for fileName, count := range item {
+			for _, word := range phrase {
+				if i == word {
+					counter[fileName] += count
 				}
 			}
 		}

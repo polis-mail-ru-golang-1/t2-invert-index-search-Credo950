@@ -33,27 +33,31 @@ func LinesToWords(lines []string) []string {
 	return result
 }
 
-func FillDict(dict map[string][]string) ([]string, error) {
+func FillDict(dict map[string]map[string]int) ([]string, error) {
 	args := os.Args[1:]
 	for _, fileName := range args {
+
 		lines, err := ReadLines(fileName)
 		if err != nil {
 			return nil, err
 		}
 		words := LinesToWords(lines)
 		for _, word := range words {
-			if !Include(dict[word], fileName) {
-				dict[word] = append(dict[word], fileName)
+			if dict[word] != nil {
+				dict[word][fileName]++
+			} else {
+				dict[word] = map[string]int{}
+				dict[word][fileName]++
 			}
 		}
 	}
 	return args, nil
 }
 
-func PrintDict(dict map[string][]string) {
+func PrintDict(dict map[string]map[string]int) {
 	fmt.Println("-------------------------------------------------------------")
-	for i, item := range dict {
-		fmt.Printf("%10s %s\n", i, item)
+	for word, item := range dict {
+		fmt.Printf("%10s %+v\n", word, item)
 	}
 	fmt.Println("-------------------------------------------------------------")
 }
@@ -64,19 +68,6 @@ func ReadPhrase() []string {
 	scanner.Scan()
 	phrase = append(phrase, scanner.Text())
 	return LinesToWords(phrase)
-}
-
-func Index(vs []string, t string) int {
-	for i, v := range vs {
-		if v == t {
-			return i
-		}
-	}
-	return -1
-}
-
-func Include(vs []string, t string) bool {
-	return Index(vs, t) >= 0
 }
 
 func PrintResult(counter map[string]int) {
