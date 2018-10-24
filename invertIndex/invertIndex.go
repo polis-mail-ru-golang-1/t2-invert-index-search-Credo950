@@ -7,12 +7,10 @@ type Dictionary = map[string]map[string]int
 func FillDict(words []string, dict Dictionary, fileName string) {
 	for _, word := range words {
 		_, ok := dict[word]
-		if ok {
-			dict[word][fileName]++
-		} else {
+		if !ok {
 			dict[word] = map[string]int{}
-			dict[word][fileName]++
 		}
+		dict[word][fileName]++
 	}
 	return
 }
