@@ -1,34 +1,47 @@
 package main
 
-import funct "./functional"
-import "log"
+import (
+	"fmt"
+	"log"
+	"os"
+
+	format "github.com/polis-mail-ru-golang-1/t2-invert-index-search-Credo950/formating"
+	inv "github.com/polis-mail-ru-golang-1/t2-invert-index-search-Credo950/invertIndex"
+)
 
 func main() {
-	dict := make(map[string][]string)
-
-	args, err := funct.FillDict(dict)
-	if err != nil {
-		log.Fatalf("ReadLines: %s", err)
-	}
-
-	funct.PrintDict(dict)
-
-	phrase := funct.ReadPhrase()
-
-	counter := make(map[string]int)
+	dict := make(inv.Dictionary)
+	args := os.Args[1:]
 	for _, fileName := range args {
-		counter[fileName] = 0
+		words, err := format.ReadWordsFromFile(fileName)
+		if err != nil {
+			log.Fatalf("%s", err)
+		}
+		inv.FillDict(words, dict, fileName)
 	}
 
-	for i, fileSlice := range dict {
-		for _, word := range phrase {
-			if i == word {
-				for _, fileName := range fileSlice {
-					counter[fileName]++
-				}
-			}
+	fmt.Println(inv.DictPrintToString(dict))
+
+	phrase := format.ReadPhrase()
+
+	counter := inv.CountWords(dict, phrase)
+
+	PrintResult(counter)
+}
+
+func PrintResult(counter map[string]int) {
+	if len(counter) == 0 {
+		return
+	}
+	var temp string
+	var max int
+	for i, item := range counter {
+		if item > max {
+			temp = i
+			max = item
 		}
 	}
-
-	funct.PrintResult(counter)
+	fmt.Printf("- %s; совпадений - %d\n", temp, max)
+	delete(counter, temp)
+	PrintResult(counter)
 }
